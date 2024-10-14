@@ -191,6 +191,11 @@ const showingNavigationDropdown = ref(false);
 
             <!-- Page Content -->
             <main>
+                <div v-if="Object.entries($page.props.errors).length > 0" class="bg-red-400 m-4 p-4 rounded-2xl">
+                    <ul>
+                        <li v-for="(error, key) in $page.props.errors" :key="key">{{error}}</li>
+                    </ul>
+                </div>
                 <slot />
             </main>
         </div>
