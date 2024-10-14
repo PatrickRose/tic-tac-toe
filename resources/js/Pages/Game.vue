@@ -1,13 +1,40 @@
 <script setup lang="ts">
 import GameBoard from '@/Components/GameBoard.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import type { Game } from '@/types/types';
-import { Head } from '@inertiajs/vue3';
+import { Game, gameDecode } from '@/types/types';
+import { Head, router } from '@inertiajs/vue3';
+import axios from 'axios';
 import { ref } from 'vue';
 
 const props = defineProps<{ game: Game }>();
 
 const game = ref<Game>(props.game);
+
+const makingMove = ref<boolean>(false);
+
+function makeMove(move: number) {
+    if (makingMove.value) {
+        return;
+    }
+
+    makingMove.value = true;
+
+    axios
+        .post(route('game.move', props.game.id), {
+            move: move,
+        })
+        .then((response) => {
+            const data = response.data;
+
+            const returnedGame = gameDecode.parse(data);
+
+            game.value = returnedGame;
+        })
+        .catch((e) => {
+            console.error(e);
+        })
+        .finally(() => (makingMove.value = false));
+}
 </script>
 
 <template>
@@ -30,21 +57,25 @@ const game = ref<Game>(props.game);
                             Player 1 (x)
                         </dt>
                         <dd>{{ game.player1?.name }}</dd>
-                        <dt class="pr-2 font-semibold after:content-[':']">Player 2 (o)</dt>
+                        <dt class="pr-2 font-semibold after:content-[':']">
+                            Player 2 (o)
+                        </dt>
                         <dd>
                             <template v-if="game.player2?.name">
                                 {{ game.player2.name }}
                             </template>
                             <template v-else>
-                              No second player yet.
-                              Share this link to get a second player: {{ route('game.join', game.id)}}
+                                No second player yet. Share this link to get a
+                                second player: {{ route('game.join', game.id) }}
                             </template>
                         </dd>
-                        <dt class="pr-2 font-semibold after:content-[':']">Turn</dt>
+                        <dt class="pr-2 font-semibold after:content-[':']">
+                            Turn
+                        </dt>
                         <dd>{{ game.moves.length % 2 == 0 ? 'X' : 'O' }}</dd>
                     </dl>
                 </div>
-                <GameBoard :moves="game.moves" />
+                <GameBoard :moves="game.moves" @makeMove="makeMove" />
             </div>
         </div>
     </AuthenticatedLayout>

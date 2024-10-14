@@ -10,10 +10,20 @@ function valueOfCell(cell: number): 'x' | 'y' | undefined {
         return undefined;
     }
 
-    return position % 2 ? 'x' : 'y';
+    return position % 2 == 0 ? 'x' : 'o';
 }
 
 const cells = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+const emits = defineEmits<{
+    makeMove: [number];
+}>();
+
+function makeMove(cell) {
+    if (valueOfCell(cell) === undefined) {
+        emits('makeMove', cell);
+    }
+}
 </script>
 
 <template>
@@ -22,6 +32,7 @@ const cells = [1, 2, 3, 4, 5, 6, 7, 8, 9];
             v-for="cell in cells"
             :key="cell"
             :value="valueOfCell(cell)"
+            @makeMove="makeMove(cell)"
         />
     </div>
 </template>

@@ -30,6 +30,13 @@ class Game extends Model
         return $this->belongsTo(User::class, 'player_2_id');
     }
 
+    public function currentTurn()
+    {
+        $moves = $this->moves;
+
+        return count($moves) % 2 == 0 ? $this->player_1_id : $this->player_2_id;
+    }
+
     /**
      * Get the attributes that should be cast.
      *

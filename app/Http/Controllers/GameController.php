@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\GameMoveRequest;
 use App\Models\Game;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class GameController extends Controller
@@ -23,6 +25,8 @@ class GameController extends Controller
     {
         $game = Game::with('player1', 'player2')
             ->findOrFail($game);
+
+        Gate::authorize('view', $game);
 
         return Inertia::render('Game', ['game' => $game]);
     }
@@ -44,5 +48,19 @@ class GameController extends Controller
         $game->save();
 
         return redirect()->route('game.show', ['game' => $game]);
+    }
+
+    public function move(Game $game, GameMoveRequest $request)
+    {
+        $moves = $game->moves;
+        $moves[] = $request->move;
+
+        $game->moves = $moves;
+
+        $game->save();
+
+        $game->load('player1', 'player2');
+
+        return $game;
     }
 }
