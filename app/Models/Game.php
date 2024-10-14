@@ -9,6 +9,17 @@ class Game extends Model
 {
     use HasFactory;
 
+    public static function initialise(int $id):Game
+    {
+        $game = new Game;
+        $game->player_1_id = $id;
+        $game->moves = [];
+
+        $game->saveOrFail();
+
+        return $game;
+    }
+
     public function player1()
     {
         return $this->belongsTo(User::class, 'player_1_id');
