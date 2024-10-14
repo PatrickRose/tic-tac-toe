@@ -35,7 +35,10 @@ const game = ref<Game>(props.game);
                             <template v-if="game.player2?.name">
                                 {{ game.player2.name }}
                             </template>
-                            <template v-else> No second player yet. </template>
+                            <template v-else>
+                              No second player yet.
+                              Share this link to get a second player: {{ route('game.join', game.id)}}
+                            </template>
                         </dd>
                         <dt class="pr-2 font-semibold after:content-[':']">Turn</dt>
                         <dd>{{ game.moves.length % 2 == 0 ? 'X' : 'O' }}</dd>

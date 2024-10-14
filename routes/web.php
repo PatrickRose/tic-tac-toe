@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'verified'])->prefix('game')->group(function () {
     Route::post('/', [GameController::class, 'store'])->name('game.create');
     Route::get('/{game}', [GameController::class, 'show'])->name('game.show');
+    Route::get('/{game}/join', [GameController::class, 'join'])->name('game.join');
 });
 
 Route::resource('game', GameController::class)->middleware(['auth', 'verified']);

@@ -26,4 +26,23 @@ class GameController extends Controller
 
         return Inertia::render('Game', ['game' => $game]);
     }
+
+    public function join(Game $game, Request $request)
+    {
+        $id = $request->user()->id;
+
+        if ($game->player_1_id == $id) {
+            return redirect()->back()->withErrors( ['game' => 'You are already in that game!']);
+        }
+
+        if ($game->player_2_id) {
+            return redirect()->back()->withErrors( ['game' => 'You are already in that game!']);
+        }
+
+        $game->player_2_id = $id;
+
+        $game->save();
+
+        return redirect()->route('game.show', ['game' => $game]);
+    }
 }
