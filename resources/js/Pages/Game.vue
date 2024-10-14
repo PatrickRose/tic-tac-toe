@@ -2,15 +2,21 @@
 import GameBoard from '@/Components/GameBoard.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Game, gameDecode } from '@/types/types';
-import { Head, router } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
-import { ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 const props = defineProps<{ game: Game }>();
 
 const game = ref<Game>(props.game);
 
 const makingMove = ref<boolean>(false);
+
+function parseAxiosResponse(response: axios.AxiosResponse<any>) {
+    const data = response.data;
+
+    game.value = gameDecode.parse(data);
+}
 
 function makeMove(move: number) {
     if (makingMove.value) {
@@ -23,18 +29,36 @@ function makeMove(move: number) {
         .post(route('game.move', props.game.id), {
             move: move,
         })
-        .then((response) => {
-            const data = response.data;
-
-            const returnedGame = gameDecode.parse(data);
-
-            game.value = returnedGame;
-        })
+        .then(parseAxiosResponse)
         .catch((e) => {
             console.error(e);
         })
         .finally(() => (makingMove.value = false));
 }
+
+let refresh: null | ReturnType<typeof setInterval> = null;
+
+function getGameState() {
+    axios
+        .get(route('game.get', props.game.id))
+        .then(parseAxiosResponse)
+        .catch((e) => {
+            console.error(e);
+        })
+        .finally(() => (makingMove.value = false));
+}
+
+onMounted(() => {
+    // Refresh game state every 3 seconds
+    // Would use websockets, but not enough time
+    refresh = setInterval(getGameState, 3000);
+});
+
+onUnmounted(() => {
+    if (refresh) {
+        clearInterval(refresh);
+    }
+});
 </script>
 
 <template>
@@ -74,6 +98,7 @@ function makeMove(move: number) {
                         </dt>
                         <dd>{{ game.moves.length % 2 == 0 ? 'X' : 'O' }}</dd>
                     </dl>
+                    <div>Game will refresh every 3 seconds :)</div>
                 </div>
                 <GameBoard :moves="game.moves" @makeMove="makeMove" />
             </div>
