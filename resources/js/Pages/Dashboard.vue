@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { gameDecode } from '@/types/types';
+import { Game, gameDecode } from '@/types/types';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import GameList from '@/Components/GameList.vue';
 
 const creating = ref<boolean>(false);
 const error = ref<string>();
@@ -31,6 +32,33 @@ function createGame() {
         })
         .finally(() => (creating.value = false));
 }
+
+const props = defineProps<{ games: Game[] }>();
+
+const groups = computed(() => {
+    const result: Record<
+        'awaiting_player' | 'in_progress' | 'completed',
+        Game[]
+    > = {
+        awaiting_player: [],
+        in_progress: [],
+        completed: [],
+    };
+
+    console.log(props.games);
+
+    props.games.forEach((game: Game) => {
+        if (game.game_state != 'in_progress') {
+            result.completed.push(game);
+        } else if (game.player_2_id) {
+            result.in_progress.push(game);
+        } else {
+            result.awaiting_player.push(game);
+        }
+    });
+
+    return result;
+});
 </script>
 
 <template>
@@ -64,6 +92,16 @@ function createGame() {
                         Creating game, please wait...
                     </template>
                 </button>
+
+                <GameList :games="groups.awaiting_player">
+                    Awaiting player
+                </GameList>
+                <GameList :games="groups.in_progress">
+                    Game in progress
+                </GameList>
+                <GameList :games="groups.completed">
+                    Completed games
+                </GameList>
             </div>
         </div>
     </AuthenticatedLayout>

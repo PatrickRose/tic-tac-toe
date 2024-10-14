@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\GameState;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +23,13 @@ class Game extends Model
         $game->saveOrFail();
 
         return $game;
+    }
+
+    public function scopeForUser(Builder $query, int $user)
+    {
+        $query->orWhere(
+            fn ($query) => $query->where('player_1_id', $user)->orWhere('player_2_id', $user)
+        );
     }
 
     protected function gameState(): Attribute
