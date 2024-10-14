@@ -29,7 +29,7 @@ function getOpponent(currId: number, game: Game) {
             <tbody>
                 <tr v-for="game in games" :key="game.id">
                     <td>{{ game.id }}</td>
-                    <td>{{ getOpponent($page.props.auth.id, game) }}</td>
+                    <td>{{ getOpponent($page.props.auth.user.id, game) }}</td>
                     <td>
                         <Link :href="route('game.show', game.id)">
                             Link to game

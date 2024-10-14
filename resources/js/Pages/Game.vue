@@ -4,6 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Game, gameDecode } from '@/types/types';
 import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
+import type {AxiosResponse} from 'axios';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 
 const props = defineProps<{ game: Game }>();
@@ -12,7 +13,7 @@ const game = ref<Game>(props.game);
 
 const makingMove = ref<boolean>(false);
 
-function parseAxiosResponse(response: axios.AxiosResponse<any>) {
+function parseAxiosResponse(response: AxiosResponse<unknown>) {
     const data = response.data;
 
     game.value = gameDecode.parse(data);

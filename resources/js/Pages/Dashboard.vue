@@ -45,8 +45,6 @@ const groups = computed(() => {
         completed: [],
     };
 
-    console.log(props.games);
-
     props.games.forEach((game: Game) => {
         if (game.game_state != 'in_progress') {
             result.completed.push(game);

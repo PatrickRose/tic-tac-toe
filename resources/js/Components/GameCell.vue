@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{ value: 'x' | 'y' | undefined }>();
+const props = defineProps<{ value: 'x' | 'o' | undefined }>();
 
 const emits = defineEmits<{
   makeMove: [];

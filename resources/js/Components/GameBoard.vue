@@ -3,7 +3,7 @@ import GameCell from '@/Components/GameCell.vue';
 
 const props = defineProps<{ moves: number[] }>();
 
-function valueOfCell(cell: number): 'x' | 'y' | undefined {
+function valueOfCell(cell: number): 'x' | 'o' | undefined {
     const position = props.moves.indexOf(cell);
 
     if (position === -1) {
@@ -19,7 +19,7 @@ const emits = defineEmits<{
     makeMove: [number];
 }>();
 
-function makeMove(cell) {
+function makeMove(cell: number) {
     if (valueOfCell(cell) === undefined) {
         emits('makeMove', cell);
     }
