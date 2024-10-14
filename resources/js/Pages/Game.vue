@@ -4,7 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Game, gameDecode } from '@/types/types';
 import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 
 const props = defineProps<{ game: Game }>();
 
@@ -59,6 +59,21 @@ onUnmounted(() => {
         clearInterval(refresh);
     }
 });
+
+const result = computed(() => {
+    switch (game.value.game_state) {
+        case 'draw':
+            return 'DRAW';
+        case 'in_progress':
+            return 'In progress';
+        case 'player_1':
+            return game.value.player1?.name;
+        case 'player_2':
+            return game.value.player2?.name;
+    }
+
+    return '';
+});
 </script>
 
 <template>
@@ -93,10 +108,22 @@ onUnmounted(() => {
                                 second player: {{ route('game.join', game.id) }}
                             </template>
                         </dd>
-                        <dt class="pr-2 font-semibold after:content-[':']">
-                            Turn
-                        </dt>
-                        <dd>{{ game.moves.length % 2 == 0 ? 'X' : 'O' }}</dd>
+                        <template v-if="game.game_state == 'in_progress'">
+                            <dt class="pr-2 font-semibold after:content-[':']">
+                                Turn
+                            </dt>
+                            <dd>
+                                {{ game.moves.length % 2 == 0 ? 'X' : 'O' }}
+                            </dd>
+                        </template>
+                        <template v-else>
+                            <dt class="pr-2 font-semibold after:content-[':']">
+                                Result
+                            </dt>
+                            <dd>
+                                {{ result }}
+                            </dd>
+                        </template>
                     </dl>
                     <div>Game will refresh every 3 seconds :)</div>
                 </div>
